@@ -1,52 +1,45 @@
 package pl.javaready.projects;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-package pl.javaready.projects;
-
 import java.util.Scanner;
 
 public class JavaBasicsQuiz {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
-        // Bank pytań
-        String[][] questions = {
+        String[][] questionOptions = {
                 {"Jaki jest domyślny typ dla liczb całkowitych w Javie?",
-                        "a) byte", "b) short", "c) int", "d) long"},
+                        "byte", "short", "int", "long"},
                 {"Który typ używamy do przechowywania pojedynczego znaku?",
-                        "a) String", "b) char", "c) int", "d) byte"},
+                        "String", "char", "int", "byte"},
                 {"Ile wartości może przyjąć typ boolean?",
-                        "a) 2", "b) 4", "c) 8", "d) nieskończenie wiele"},
+                        "2", "4", "8", "nieskończenie wiele"},
                 {"Która konwencja nazewnictwa jest poprawna dla zmiennych w Javie?",
-                        "a) snake_case", "b) camelCase", "c) PascalCase", "d) kebab-case"},
+                        "snake_case", "camelCase", "PascalCase", "kebab-case"},
                 {"Co wykona kod: int x = 5; x += 3;?",
-                        "a) x = 5", "b) x = 3", "c) x = 8", "d) błąd kompilacji"},
+                        "x = 5", "x = 3", "x = 8", "błąd kompilacji"},
                 {"Która pętla wykona się przynajmniej raz, nawet jeśli warunek jest fałszywy?",
-                        "a) for", "b) while", "c) do-while", "d) żadna"},
+                        "for", "while", "do-while", "żadna"},
                 {"Co robi słowo kluczowe 'break' w pętli?",
-                        "a) Pomija bieżącą iterację", "b) Kończy całą pętlę", "c) Restartuje pętlę", "d) Nie robi nic"},
+                        "Pomija bieżącą iterację", "Kończy całą pętlę", "Restartuje pętlę", "Nie robi nic"},
                 {"Od którego indeksu zaczynają się tablice w Javie?",
-                        "a) -1", "b) 0", "c) 1", "d) zależy od rozmiaru"},
+                        "-1", "0", "1", "zależy od rozmiaru"},
                 {"Jak utworzyć tablicę 5 liczb całkowitych?",
-                        "a) int[] numbers = new int[5];", "b) int numbers[5];", "c) array<int> numbers = 5;", "d) int[] numbers = 5;"},
+                        "int[] numbers = new int[5];", "int numbers[5];", "array<int> numbers = 5;", "int[] numbers = 5;"},
                 {"Co oznacza słowo kluczowe 'void' przy funkcji?",
-                        "a) Funkcja jest pusta", "b) Funkcja nic nie zwraca", "c) Funkcja jest prywatna", "d) Funkcja nie przyjmuje parametrów"},
+                        "Funkcja jest pusta", "Funkcja nic nie zwraca", "Funkcja jest prywatna", "Funkcja nie przyjmuje parametrów"},
                 {"Który operator logiczny oznacza 'lub'?",
-                        "a) &&", "b) ||", "c) !", "d) &"},
+                        "&&", "||", "!", "&"},
                 {"Co zwróci wyrażenie: 10 / 3 w Javie (jeśli obie liczby to int)?",
-                        "a) 3.33", "b) 3", "c) 4", "d) błąd"},
+                        "3.33", "3", "4", "błąd"},
                 {"Jaki typ danych służy do przechowywania tekstu?",
-                        "a) char", "b) String", "c) text", "d) varchar"},
+                        "char", "String", "text", "varchar"},
                 {"Co to jest przeciążanie funkcji (overloading)?",
-                        "a) Funkcja która zwraca za dużo danych", "b) Używanie tej samej nazwy funkcji z różnymi parametrami", "c) Funkcja która działa wolno", "d) Błąd kompilacji"},
+                        "Funkcja która zwraca za dużo danych", "Używanie tej samej nazwy funkcji z różnymi parametrami", "Funkcja która działa wolno", "Błąd kompilacji"},
                 {"Która pętla jest najlepsza, gdy znamy z góry liczbę iteracji?",
-                        "a) for", "b) while", "c) do-while", "d) wszystkie są równie dobre"}
+                        "for", "while", "do-while", "wszystkie są równie dobre"}
         };
-
-        String[] correctAnswers = {"c", "b", "a", "b", "c", "c", "b", "b", "a", "b", "b", "b", "b", "b", "a"};
-
+        int howManyOptionsToChoose = 4;
+        int[] correctAnswerIndices = {2, 1, 0, 1, 2, 2, 1, 1, 0, 1, 1, 1, 1, 1, 0};
         String[] explanations = {
                 "W Javie domyślnym typem dla liczb całkowitych jest int.",
                 "Typ char przechowuje pojedynczy znak w pojedynczym apostrofie 'A'.",
@@ -64,51 +57,290 @@ public class JavaBasicsQuiz {
                 "Przeciążanie (overloading) to używanie tej samej nazwy funkcji z różnymi parametrami.",
                 "Pętla for jest najlepsza, gdy znamy liczbę iteracji z góry."
         };
-
         boolean keepPlaying = true;
-
         while (keepPlaying) {
             displayWelcome();
             String userName = getUserName(scanner);
             displayRules();
             waitForEnter(scanner);
-
-            int totalQuestions = questions.length;
-            boolean[] wasCorrect = new boolean[totalQuestions];
-            int correctCount = runQuiz(scanner, questions, correctAnswers, explanations, wasCorrect);
-
-            displayResults(userName, correctCount, totalQuestions, wasCorrect, questions);
-
+            int totalQuestions = getTotalQuestions(questionOptions);
+            boolean[] correctAnswers = runQuiz(scanner, questionOptions, correctAnswerIndices, explanations, totalQuestions, howManyOptionsToChoose);
+            int correctCount = countCorrectAnswers(correctAnswers);
+            displayResults(userName, correctCount, totalQuestions, correctAnswers, questionOptions);
             keepPlaying = wantsToRetry(scanner);
         }
-
         displayGoodbye();
         scanner.close();
     }
 
+    public static int getTotalQuestions(String[][] questionOptions) {
+        return questionOptions.length;
+    }
+
+    public static boolean[] runQuiz(Scanner scanner, String[][] questionOptions, int[] correctAnswerIndices, String[] explanations, int totalQuestions, int howManyOptionsToChoose) {
+        boolean[] wasCorrect = createWasCorrectArray(totalQuestions);
+        for (int i = 0; i < totalQuestions; i++) {
+            boolean isCorrect = proceedSingleQuestion(scanner, questionOptions, correctAnswerIndices, explanations, i, totalQuestions, howManyOptionsToChoose);
+            wasCorrect[i] = isCorrect;
+        }
+        return wasCorrect;
+    }
+
+    public static boolean[] createWasCorrectArray(int totalQuestions) {
+        return new boolean[totalQuestions];
+    }
+
+    public static boolean proceedSingleQuestion(Scanner scanner, String[][] questionOptions, int[] correctAnswerIndices, String[] explanations, int questionIndex, int totalQuestions, int howManyOptionsToChoose) {
+        int questionNumber = calculateQuestionNumber(questionIndex);
+        displayQuestionNumber(questionNumber, totalQuestions);
+        int[] shuffledOrder = generateShuffledOrder(howManyOptionsToChoose);
+        String[] shuffledQuestion = shuffleQuestionOptions(questionOptions[questionIndex], shuffledOrder);
+        int newCorrectIndex = findNewCorrectIndex(correctAnswerIndices[questionIndex], shuffledOrder);
+        displayQuestion(shuffledQuestion);
+        String userAnswer = getValidAnswer(scanner);
+        int userAnswerIndex = convertAnswerToIndex(userAnswer);
+        boolean isCorrect = checkAnswerByIndex(userAnswerIndex, newCorrectIndex);
+        displayFeedback(isCorrect, newCorrectIndex);
+        displayExplanation(explanations[questionIndex]);
+        if (isNotLastQuestion(questionIndex, totalQuestions)) {
+            waitForNextQuestion(scanner);
+        }
+        return isCorrect;
+    }
+
+    public static int calculateQuestionNumber(int questionIndex) {
+        return questionIndex + 1;
+    }
+
+    public static void displayFeedback(boolean isCorrect, int correctIndex) {
+        if (isCorrect) {
+            displayCorrectFeedback();
+        } else {
+            String correctLetter = convertIndexToAnswer(correctIndex);
+            displayIncorrectFeedback(correctLetter);
+        }
+    }
+
+    public static int[] generateShuffledOrder(int size) {
+        int[] order = createOrderArray(size);
+        int[] shuffled = shuffleOrderArray(order, size);
+        return shuffled;
+    }
+
+    public static int[] createOrderArray(int size) {
+        int[] order = new int[size];
+        for (int i = 0; i < size; i++) {
+            order[i] = i;
+        }
+        return order;
+    }
+
+    public static int[] shuffleOrderArray(int[] order, int size) {
+        int[] result = copyArray(order);
+        for (int i = size - 1; i > 0; i--) {
+            int randomIndex = generateRandomIndex(i);
+            result = swapAndReturn(result, i, randomIndex);
+        }
+        return result;
+    }
+
+    public static int[] copyArray(int[] original) {
+        int[] copy = new int[original.length];
+        for (int i = 0; i < original.length; i++) {
+            copy[i] = original[i];
+        }
+        return copy;
+    }
+
+    public static int generateRandomIndex(int maxIndex) {
+        double random = Math.random() * (maxIndex + 1);
+        int randomInt = (int) random;
+        return randomInt;
+    }
+
+    public static int[] swapAndReturn(int[] array, int index1, int index2) {
+        int[] result = copyArray(array);
+        int temp = result[index1];
+        result[index1] = result[index2];
+        result[index2] = temp;
+        return result;
+    }
+
+    public static String[] shuffleQuestionOptions(String[] originalQuestion, int[] order) {
+        String[] result = createEmptyShuffledArray(originalQuestion);
+        result = setQuestionText(result, originalQuestion);
+        result = setShuffledAnswers(result, originalQuestion, order);
+        return result;
+    }
+
+    public static String[] createEmptyShuffledArray(String[] originalQuestion) {
+        return new String[originalQuestion.length];
+    }
+
+    public static String[] setQuestionText(String[] shuffled, String[] original) {
+        String[] result = copyStringArray(shuffled);
+        result[0] = original[0];
+        return result;
+    }
+
+    public static String[] setShuffledAnswers(String[] shuffled, String[] original, int[] order) {
+        String[] result = copyStringArray(shuffled);
+        int numberOfAnswers = order.length;
+        for (int i = 0; i < numberOfAnswers; i++) {
+            result[i + 1] = original[order[i] + 1];
+        }
+        return result;
+    }
+
+    public static String[] copyStringArray(String[] original) {
+        String[] copy = new String[original.length];
+        for (int i = 0; i < original.length; i++) {
+            copy[i] = original[i];
+        }
+        return copy;
+    }
+
+    public static int findNewCorrectIndex(int originalCorrectIndex, int[] shuffledOrder) {
+        for (int i = 0; i < shuffledOrder.length; i++) {
+            if (isCorrectIndexAtPosition(shuffledOrder[i], originalCorrectIndex)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    public static boolean isCorrectIndexAtPosition(int shuffledValue, int originalCorrectIndex) {
+        return shuffledValue == originalCorrectIndex;
+    }
+
+    public static int convertAnswerToIndex(String answer) {
+        if (isAnswerA(answer)) {
+            return 0;
+        } else if (isAnswerB(answer)) {
+            return 1;
+        } else if (isAnswerC(answer)) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
+
+    public static boolean isAnswerA(String answer) {
+        return answer.equals("a");
+    }
+
+    public static boolean isAnswerB(String answer) {
+        return answer.equals("b");
+    }
+
+    public static boolean isAnswerC(String answer) {
+        return answer.equals("c");
+    }
+
+    public static boolean isAnswerD(String answer) {
+        return answer.equals("d");
+    }
+
+    public static String convertIndexToAnswer(int index) {
+        if (isIndexZero(index)) {
+            return "a";
+        } else if (isIndexOne(index)) {
+            return "b";
+        } else if (isIndexTwo(index)) {
+            return "c";
+        } else {
+            return "d";
+        }
+    }
+
+    public static boolean isIndexZero(int index) {
+        return index == 0;
+    }
+
+    public static boolean isIndexOne(int index) {
+        return index == 1;
+    }
+
+    public static boolean isIndexTwo(int index) {
+        return index == 2;
+    }
+
+    public static boolean checkAnswerByIndex(int userIndex, int correctIndex) {
+        return userIndex == correctIndex;
+    }
+
+    public static int countCorrectAnswers(boolean[] wasCorrect) {
+        int count = 0;
+        for (int i = 0; i < wasCorrect.length; i++) {
+            if (wasCorrect[i]) {
+                count = incrementCount(count);
+            }
+        }
+        return count;
+    }
+
+    public static int incrementCount(int count) {
+        return count + 1;
+    }
+
     public static void displayWelcome() {
-        System.out.println("");
-        System.out.println("╔═══════════════════════════════════╗");
-        System.out.println("║   QUIZ - JAVA BASICS (Część 1)    ║");
-        System.out.println("╔═══════════════════════════════════╗");
-        System.out.println("");
-        System.out.println("Witaj w quizie sprawdzającym wiedzę z podstaw Javy!");
-        System.out.println("Czeka na Ciebie 15 pytań z materiału Części 1 kursu.");
+        displayEmptyLine();
+        displayWelcomeHeader();
+        displayEmptyLine();
+        displayWelcomeMessage();
+        displayQuizDescription();
+        displayEmptyLine();
+    }
+
+    public static void displayEmptyLine() {
         System.out.println("");
     }
 
+    public static void displayWelcomeHeader() {
+        System.out.println("╔═══════════════════════════════════╗");
+        System.out.println("║   QUIZ - JAVA BASICS (Część 1)    ║");
+        System.out.println("╔═══════════════════════════════════╗");
+    }
+
+    public static void displayWelcomeMessage() {
+        System.out.println("Witaj w quizie sprawdzającym wiedzę z podstaw Javy!");
+    }
+
+    public static void displayQuizDescription() {
+        System.out.println("Czeka na Ciebie 15 pytań z materiału Części 1 kursu.");
+    }
+
     public static String getUserName(Scanner scanner) {
-        System.out.println("Jak masz na imię?");
-        String name = scanner.nextLine().trim();
-
-        while (isNameEmpty(name)) {
-            System.out.println("Imię nie może być puste. Spróbuj ponownie:");
-            name = scanner.nextLine().trim();
-        }
-
-        System.out.println("");
-        System.out.println("Cześć " + name + "! Zaczynamy!");
+        displayNamePrompt();
+        String name = readName(scanner);
+        name = validateName(scanner, name);
+        displayGreeting(name);
         return name;
+    }
+
+    public static void displayNamePrompt() {
+        System.out.println("Jak masz na imię?");
+    }
+
+    public static String readName(Scanner scanner) {
+        return scanner.nextLine();
+    }
+
+    public static String validateName(Scanner scanner, String name) {
+        while (isNameEmpty(name)) {
+            displayNameEmptyError();
+            name = readName(scanner);
+        }
+        return name;
+    }
+
+    public static void displayNameEmptyError() {
+        System.out.println("Imię nie może być puste. Spróbuj ponownie:");
+    }
+
+    public static void displayGreeting(String name) {
+        displayEmptyLine();
+        System.out.println("Cześć " + name + "! Zaczynamy!");
     }
 
     public static boolean isNameEmpty(String name) {
@@ -116,12 +348,37 @@ public class JavaBasicsQuiz {
     }
 
     public static void displayRules() {
-        System.out.println("");
+        displayEmptyLine();
+        displayRulesHeader();
+        displayRuleAnswer();
+        displayRuleRandomOrder();
+        displayRuleFeedback();
+        displayRuleResults();
+        displayEmptyLine();
+        displayReadyPrompt();
+    }
+
+    public static void displayRulesHeader() {
         System.out.println("=== ZASADY ===");
+    }
+
+    public static void displayRuleAnswer() {
         System.out.println("• Na każde pytanie odpowiadasz literą: a, b, c lub d");
+    }
+
+    public static void displayRuleRandomOrder() {
+        System.out.println("• Kolejność odpowiedzi jest losowa dla każdego pytania!");
+    }
+
+    public static void displayRuleFeedback() {
         System.out.println("• Po każdej odpowiedzi dowiesz się czy była poprawna");
+    }
+
+    public static void displayRuleResults() {
         System.out.println("• Na końcu zobaczysz swój wynik i ocenę");
-        System.out.println("");
+    }
+
+    public static void displayReadyPrompt() {
         System.out.println("Naciśnij ENTER, gdy będziesz gotowy...");
     }
 
@@ -129,89 +386,111 @@ public class JavaBasicsQuiz {
         scanner.nextLine();
     }
 
-    public static int runQuiz(Scanner scanner, String[][] questions, String[] correctAnswers,
-                              String[] explanations, boolean[] wasCorrect) {
-        int correctCount = 0;
-        int totalQuestions = questions.length;
-
-        for (int i = 0; i < totalQuestions; i++) {
-            displayQuestionNumber(i + 1, totalQuestions);
-            displayQuestion(questions[i]);
-
-            String userAnswer = getValidAnswer(scanner);
-            boolean isCorrect = checkAnswer(userAnswer, correctAnswers[i]);
-
-            if (isCorrect) {
-                correctCount++;
-                wasCorrect[i] = true;
-                displayCorrectFeedback();
-            } else {
-                wasCorrect[i] = false;
-                displayIncorrectFeedback(correctAnswers[i]);
-            }
-
-            displayExplanation(explanations[i]);
-
-            if (isNotLastQuestion(i, totalQuestions)) {
-                waitForNextQuestion(scanner);
-            }
-        }
-
-        return correctCount;
+    public static void displayQuestionNumber(int current, int total) {
+        displayEmptyLine();
+        displayQuestionSeparator();
+        displayQuestionCounter(current, total);
+        displayQuestionSeparator();
+        displayEmptyLine();
     }
 
-    public static void displayQuestionNumber(int current, int total) {
-        System.out.println("");
+    public static void displayQuestionSeparator() {
         System.out.println("═══════════════════════════════════");
+    }
+
+    public static void displayQuestionCounter(int current, int total) {
         System.out.println("PYTANIE " + current + "/" + total);
-        System.out.println("═══════════════════════════════════");
-        System.out.println("");
     }
 
     public static void displayQuestion(String[] questionData) {
+        displayQuestionText(questionData);
+        displayEmptyLine();
+        displayAnswerOptions(questionData);
+        displayEmptyLine();
+    }
+
+    public static void displayQuestionText(String[] questionData) {
         System.out.println(questionData[0]);
-        System.out.println("");
+    }
 
-        for (int i = 1; i < questionData.length; i++) {
-            System.out.println(questionData[i]);
-        }
+    public static void displayAnswerOptions(String[] questionData) {
+        displayAnswerA(questionData[1]);
+        displayAnswerB(questionData[2]);
+        displayAnswerC(questionData[3]);
+        displayAnswerD(questionData[4]);
+    }
 
-        System.out.println("");
+    public static void displayAnswerA(String text) {
+        System.out.println("a) " + text);
+    }
+
+    public static void displayAnswerB(String text) {
+        System.out.println("b) " + text);
+    }
+
+    public static void displayAnswerC(String text) {
+        System.out.println("c) " + text);
+    }
+
+    public static void displayAnswerD(String text) {
+        System.out.println("d) " + text);
     }
 
     public static String getValidAnswer(Scanner scanner) {
-        System.out.println("Twoja odpowiedź (a/b/c/d):");
-        String answer = scanner.nextLine().trim().toLowerCase();
-
-        while (!isValidAnswer(answer)) {
-            System.out.println("Nieprawidłowa odpowiedź. Wybierz a, b, c lub d:");
-            answer = scanner.nextLine().trim().toLowerCase();
-        }
-
+        displayAnswerPrompt();
+        String answer = readAnswer(scanner);
+        answer = validateAnswer(scanner, answer);
         return answer;
     }
 
-    public static boolean isValidAnswer(String answer) {
-        return answer.equals("a") || answer.equals("b") ||
-                answer.equals("c") || answer.equals("d");
+    public static void displayAnswerPrompt() {
+        System.out.println("Twoja odpowiedź (a/b/c/d):");
     }
 
-    public static boolean checkAnswer(String userAnswer, String correctAnswer) {
-        return userAnswer.equals(correctAnswer);
+    public static String readAnswer(Scanner scanner) {
+        return scanner.nextLine();
+    }
+
+    public static String validateAnswer(Scanner scanner, String answer) {
+        while (!isValidAnswer(answer)) {
+            displayInvalidAnswerError();
+            answer = readAnswer(scanner);
+        }
+        return answer;
+    }
+
+    public static void displayInvalidAnswerError() {
+        System.out.println("Nieprawidłowa odpowiedź. Wybierz a, b, c lub d:");
+    }
+
+    public static boolean isValidAnswer(String answer) {
+        return isAnswerA(answer) || isAnswerB(answer) || isAnswerC(answer) || isAnswerD(answer);
     }
 
     public static void displayCorrectFeedback() {
-        System.out.println("");
+        displayEmptyLine();
+        displayCorrectMessage();
+    }
+
+    public static void displayCorrectMessage() {
         System.out.println("✓ POPRAWNIE! Świetna robota!");
     }
 
     public static void displayIncorrectFeedback(String correctAnswer) {
-        System.out.println("");
+        displayEmptyLine();
+        displayIncorrectMessage(correctAnswer);
+    }
+
+    public static void displayIncorrectMessage(String correctAnswer) {
         System.out.println("✗ BŁĘDNA ODPOWIEDŹ! Poprawna odpowiedź to: " + correctAnswer);
     }
 
     public static void displayExplanation(String explanation) {
-        System.out.println("");
+        displayEmptyLine();
+        displayExplanationText(explanation);
+    }
+
+    public static void displayExplanationText(String explanation) {
         System.out.println("→ Wyjaśnienie: " + explanation);
     }
 
@@ -220,23 +499,37 @@ public class JavaBasicsQuiz {
     }
 
     public static void waitForNextQuestion(Scanner scanner) {
-        System.out.println("");
-        System.out.println("Naciśnij ENTER, aby przejść do następnego pytania...");
+        displayEmptyLine();
+        displayNextQuestionPrompt();
         scanner.nextLine();
     }
 
-    public static void displayResults(String userName, int correctCount, int totalQuestions,
-                                      boolean[] wasCorrect, String[][] questions) {
-        System.out.println("");
-        System.out.println("═══════════════════════════════════");
-        System.out.println("       TWOJE WYNIKI");
-        System.out.println("═══════════════════════════════════");
-        System.out.println("");
+    public static void displayNextQuestionPrompt() {
+        System.out.println("Naciśnij ENTER, aby przejść do następnego pytania...");
+    }
 
+    public static void displayResults(String userName, int correctCount, int totalQuestions, boolean[] wasCorrect, String[][] questions) {
+        displayResultsHeader();
         displayScore(userName, correctCount, totalQuestions);
         displayPercentage(correctCount, totalQuestions);
         displayGrade(correctCount, totalQuestions);
         displayWrongAnswers(wasCorrect, questions);
+    }
+
+    public static void displayResultsHeader() {
+        displayEmptyLine();
+        displayResultsSeparator();
+        displayResultsTitle();
+        displayResultsSeparator();
+        displayEmptyLine();
+    }
+
+    public static void displayResultsSeparator() {
+        System.out.println("═══════════════════════════════════");
+    }
+
+    public static void displayResultsTitle() {
+        System.out.println("       TWOJE WYNIKI");
     }
 
     public static void displayScore(String userName, int correct, int total) {
@@ -245,15 +538,29 @@ public class JavaBasicsQuiz {
 
     public static void displayPercentage(int correct, int total) {
         double percentage = calculatePercentage(correct, total);
-        System.out.println("Wynik: " + roundToTwoDecimals(percentage) + "%");
-        System.out.println("");
+        double rounded = roundToTwoDecimals(percentage);
+        displayPercentageText(rounded);
+        displayEmptyLine();
+    }
+
+    public static void displayPercentageText(double percentage) {
+        System.out.println("Wynik: " + percentage + "%");
     }
 
     public static double calculatePercentage(int correct, int total) {
-        if (total == 0) {
+        if (isTotalZero(total)) {
             return 0.0;
         }
-        return ((double) correct / total) * 100.0;
+        return calculatePercentageValue(correct, total);
+    }
+
+    public static boolean isTotalZero(int total) {
+        return total == 0;
+    }
+
+    public static double calculatePercentageValue(int correct, int total) {
+        double percentageMultiplier = 100.0;
+        return ((double) correct / total) * percentageMultiplier;
     }
 
     public static double roundToTwoDecimals(double value) {
@@ -264,63 +571,123 @@ public class JavaBasicsQuiz {
     public static void displayGrade(int correct, int total) {
         double percentage = calculatePercentage(correct, total);
         String grade = getGradeDescription(percentage);
+        displayGradeText(grade);
+        displayEmptyLine();
+    }
 
+    public static void displayGradeText(String grade) {
         System.out.println("OCENA: " + grade);
-        System.out.println("");
     }
 
     public static String getGradeDescription(double percentage) {
-        if (percentage >= 90) {
+        if (isExcellentGrade(percentage)) {
             return "Świetnie! Opanowałeś materiał!";
-        } else if (percentage >= 70) {
+        } else if (isGoodGrade(percentage)) {
             return "Dobrze! Jeszcze kilka tematów do powtórki.";
-        } else if (percentage >= 50) {
+        } else if (isFairGrade(percentage)) {
             return "Nieźle, ale warto powtórzyć podstawy.";
         } else {
             return "Polecam wrócić do materiałów kursu.";
         }
     }
 
+    public static boolean isExcellentGrade(double percentage) {
+        double excellentThreshold = 90;
+        return percentage >= excellentThreshold;
+    }
+
+    public static boolean isGoodGrade(double percentage) {
+        double goodThreshold = 70;
+        return percentage >= goodThreshold;
+    }
+
+    public static boolean isFairGrade(double percentage) {
+        double fairThreshold = 50;
+        return percentage >= fairThreshold;
+    }
+
     public static void displayWrongAnswers(boolean[] wasCorrect, String[][] questions) {
-        System.out.println("═══════════════════════════════════");
+        displayWrongAnswersHeader();
+        boolean hadWrongAnswers = displayWrongAnswersList(wasCorrect, questions);
+        if (!hadWrongAnswers) {
+            displayAllCorrectMessage();
+        }
+        displayEmptyLine();
+    }
+
+    public static void displayWrongAnswersHeader() {
+        displayResultsSeparator();
+        displayWrongAnswersTitle();
+        displayResultsSeparator();
+        displayEmptyLine();
+    }
+
+    public static void displayWrongAnswersTitle() {
         System.out.println("  PYTANIA Z BŁĘDNYMI ODPOWIEDZIAMI");
-        System.out.println("═══════════════════════════════════");
-        System.out.println("");
+    }
 
+    public static boolean displayWrongAnswersList(boolean[] wasCorrect, String[][] questions) {
         boolean hadWrongAnswers = false;
-
         for (int i = 0; i < wasCorrect.length; i++) {
             if (!wasCorrect[i]) {
                 hadWrongAnswers = true;
-                displaySingleWrongAnswer(i + 1, questions[i][0]);
+                int questionNumber = calculateQuestionNumber(i);
+                displaySingleWrongAnswer(questionNumber, questions[i][0]);
             }
         }
-
-        if (!hadWrongAnswers) {
-            System.out.println("🎉 Brawo! Wszystkie odpowiedzi poprawne!");
-        }
-
-        System.out.println("");
+        return hadWrongAnswers;
     }
 
     public static void displaySingleWrongAnswer(int questionNumber, String questionText) {
         System.out.println("✗ Pytanie " + questionNumber + ": " + questionText);
     }
 
+    public static void displayAllCorrectMessage() {
+        System.out.println("🎉 Brawo! Wszystkie odpowiedzi poprawne!");
+    }
+
     public static boolean wantsToRetry(Scanner scanner) {
-        System.out.println("═══════════════════════════════════");
+        displayRetryPrompt();
+        String answer = readRetryAnswer(scanner);
+        return isRetryAnswer(answer);
+    }
+
+    public static void displayRetryPrompt() {
+        displayResultsSeparator();
         System.out.println("Czy chcesz spróbować ponownie? (tak/nie)");
-        String answer = scanner.nextLine().trim().toLowerCase();
-        return answer.equals("tak");
+    }
+
+    public static String readRetryAnswer(Scanner scanner) {
+        return scanner.nextLine();
+    }
+
+    public static boolean isRetryAnswer(String answer) {
+        return answer.equalsIgnoreCase("tak");
     }
 
     public static void displayGoodbye() {
-        System.out.println("");
-        System.out.println("═══════════════════════════════════");
+        displayEmptyLine();
+        displayGoodbyeSeparator();
+        displayGoodbyeMessage();
+        displayMotivationalMessage();
+        displayFarewellMessage();
+        displayGoodbyeSeparator();
+        displayEmptyLine();
+    }
+
+    public static void displayGoodbyeSeparator() {
+        displayResultsSeparator();
+    }
+
+    public static void displayGoodbyeMessage() {
         System.out.println("Dziękujemy za rozwiązanie quizu!");
+    }
+
+    public static void displayMotivationalMessage() {
         System.out.println("Pamiętaj: Praktyka czyni mistrza!");
+    }
+
+    public static void displayFarewellMessage() {
         System.out.println("Powodzenia w nauce Javy! 🚀");
-        System.out.println("═══════════════════════════════════");
-        System.out.println("");
     }
 }
